@@ -10,11 +10,24 @@ use std::fmt::Write;
 use std::process::Command;
 
 fn main() {
-    let features = ["raw", "fmt-no-args", "fmt-u32", "fmt-i32", "fmt-f32"];
+    let mut output_file_contents = String::from("# Output\n\n");
 
-    let mut output_file_contents = String::from(
-        r#"# Output
+    let fmt_features = ["raw", "fmt-no-args", "fmt-u32", "fmt-i32", "fmt-f32"];
+    output_file_contents += "## Fmt\n\nTest of builtin fmt machinery.\n";
+    output_file_contents += &run_tests(&fmt_features);
+    output_file_contents += "\n";
 
+    let ufmt_features = ["raw", "ufmt-no-args", "ufmt-u32", "ufmt-i32", "ufmt-f32"];
+    output_file_contents += "## Ufmt\n\nTest of the ufmt crate.\n\n*NOTE:* The f32 implementation has many limitations.\n";
+    output_file_contents += &run_tests(&ufmt_features);
+    output_file_contents += "\n";
+
+    std::fs::write("results.md", &output_file_contents).unwrap();
+}
+
+fn run_tests(features: &[&str]) -> String {
+    let mut output_table = format!(
+        r#"
 |features|text|rodata|total flash|
 |--------|---:|-----:|----------:|
 "#,
@@ -22,13 +35,12 @@ fn main() {
 
     let mut results = Vec::new();
 
-    for feature in Some(vec![""])
+    for feature in Some(vec![String::from("")])
         .into_iter()
-        .chain(features.into_iter().combinations(1))
-        .chain(features.into_iter().combinations(2))
-        .chain(features.into_iter().combinations(3))
-        .chain(features.into_iter().combinations(4))
-        .chain(features.into_iter().combinations(5))
+        .chain(features.into_iter().map(|feature| String::from(*feature)).combinations(1))
+        .chain(features.into_iter().map(|feature| String::from(*feature)).combinations(2))
+        // .chain(features.into_iter().map(|feature| String::from(*feature)).combinations(3))
+        .chain(Some(vec![features.join(",")]))
     {
         let feature = feature.join(",");
 
@@ -54,7 +66,7 @@ fn main() {
 
     for result in results {
         writeln!(
-            output_file_contents,
+            output_table,
             "|{}|{}|{}|{}|",
             result.features,
             result.text,
@@ -64,7 +76,7 @@ fn main() {
         .unwrap();
     }
 
-    std::fs::write("results.md", &output_file_contents).unwrap();
+    output_table
 }
 
 #[derive(Debug)]

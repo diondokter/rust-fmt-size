@@ -106,6 +106,7 @@ dependencies = [
  "rustc_version 0.4.0",
  "spin",
  "stable_deref_trait",
+ "ufmt-write",
 ]
 
 [[package]]
@@ -117,6 +118,12 @@ dependencies = [
  "autocfg",
  "scopeguard",
 ]
+
+[[package]]
+name = "micromath"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39617bc909d64b068dcffd0e3e31679195b5576d0c83fadc52690268cc2b2b55"
 
 [[package]]
 name = "nb"
@@ -229,6 +236,45 @@ dependencies = [
  "cortex-m",
  "cortex-m-rt",
  "heapless",
+ "ufmt",
+ "ufmt_float",
+]
+
+[[package]]
+name = "ufmt"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1a64846ec02b57e9108d6469d98d1648782ad6bb150a95a9baac26900bbeab9d"
+dependencies = [
+ "ufmt-macros",
+ "ufmt-write",
+]
+
+[[package]]
+name = "ufmt-macros"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d337d3be617449165cb4633c8dece429afd83f84051024079f97ad32a9663716"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "ufmt-write"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e87a2ed6b42ec5e28cc3b94c09982969e9227600b2e3dcbc1db927a84c06bd69"
+
+[[package]]
+name = "ufmt_float"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7181bd69b8da1f7822e3b9ab86e89c1c9bd42a6558407c81821ed18738d097b4"
+dependencies = [
+ "micromath",
+ "ufmt",
 ]
 
 [[package]]

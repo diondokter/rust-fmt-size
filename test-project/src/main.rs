@@ -14,8 +14,7 @@ fn main() -> ! {
     let value = unsafe { ((SCRATCH_SPACE_START + 0x800) as *const i32).read_volatile() };
 
     if cfg!(feature = "raw") {
-        string.push('T').unwrap();
-        string.push_str("est").unwrap();
+        string.push_str("Test").unwrap();
     }
     if cfg!(feature = "fmt-no-args") {
         use core::fmt::Write;
@@ -32,6 +31,22 @@ fn main() -> ! {
     if cfg!(feature = "fmt-f32") {
         use core::fmt::Write;
         write!(string, "{}", value as f32).unwrap();
+    }
+    if cfg!(feature = "ufmt-no-args") {
+        use ufmt::uwrite;
+        uwrite!(string, "Test").unwrap();
+    }
+    if cfg!(feature = "ufmt-u32") {
+        use ufmt::uwrite;
+        uwrite!(string, "{}", value as u32).unwrap();
+    }
+    if cfg!(feature = "ufmt-i32") {
+        use ufmt::uwrite;
+        uwrite!(string, "{}", value as i32).unwrap();
+    }
+    if cfg!(feature = "ufmt-f32") {
+        use ufmt::uwrite;
+        uwrite!(string, "{}", ufmt_float::uFmt_f32::Four(value as f32)).unwrap();
     }
 
     // Make sure the string is not optimized away

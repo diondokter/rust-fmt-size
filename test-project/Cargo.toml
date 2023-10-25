@@ -8,13 +8,15 @@ edition = "2021"
 [dependencies]
 cortex-m = { version = "0.7.7", features = ["inline-asm"] }
 cortex-m-rt = { version = "0.7.3" }
-heapless = "0.7.16"
+heapless = { version = "0.7.16", features = ["ufmt-impl"] }
+ufmt = "0.2.0"
+ufmt_float = "0.2.0"
 
 [profile.release]
 lto = true
 debug = false
 opt-level = "z"
-panic = "abort"
+# panic = "abort"
 codegen-units = 1
 incremental = false
 
@@ -24,3 +26,7 @@ fmt-no-args = []
 fmt-u32 = []
 fmt-i32 = []
 fmt-f32 = []
+ufmt-no-args = []
+ufmt-u32 = []
+ufmt-i32 = []
+ufmt-f32 = []
