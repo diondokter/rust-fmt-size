@@ -54,13 +54,20 @@ Test of the ufmt crate.
 
 ## Dyn-comparison
 
-See that `raw` is similar to `ufmt-no-args` and `dyn` is similar to `fmt-no-args` of the fmt-comparison test.
+See that `raw` is similar to `ufmt` and `dyn` is similar to `fmt` of the fmt-comparison test.
 
 |features|text|rodata|total flash|
 |--------|---:|-----:|----------:|
-||500|0|500|
-|raw|716|4|720|
-|dyn|1268|28|1296|
-|raw,dyn|1308|28|1336|
-|raw,dyn|1308|28|1336|
+||492|0|492|
+|raw-str|708|4|712|
+|raw-u32|1120|0|1120|
+|raw-str,raw-u32|1252|4|1256|
+|dyn-str|1260|28|1288|
+|raw-str,dyn-str|1300|28|1328|
+|dyn-u32|1696|24|1720|
+|dyn-str,raw-u32|1736|28|1764|
+|raw-str,dyn-u32|1740|28|1768|
+|dyn-str,dyn-u32|1760|28|1788|
+|raw-u32,dyn-u32|1772|24|1796|
+|raw-str,dyn-str,raw-u32,dyn-u32|1860|28|1888|
 

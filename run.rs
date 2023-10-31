@@ -27,8 +27,8 @@ fn main() {
     );
     output_file_contents += "\n";
 
-    output_file_contents += "## Dyn-comparison\n\nSee that `raw` is similar to `ufmt-no-args` and `dyn` is similar to `fmt-no-args` of the fmt-comparison test.\n";
-    output_file_contents += &run_tests("./dyn-comparison", &["raw", "dyn"]);
+    output_file_contents += "## Dyn-comparison\n\nSee that `raw` is similar to `ufmt` and `dyn` is similar to `fmt` of the fmt-comparison test.\n";
+    output_file_contents += &run_tests("./dyn-comparison", &["raw-str", "dyn-str", "raw-u32", "dyn-u32"]);
     output_file_contents += "\n";
 
     std::fs::write("results.md", &output_file_contents).unwrap();
