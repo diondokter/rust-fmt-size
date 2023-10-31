@@ -5,11 +5,20 @@ Let's compare different binary sizes with regards to fmt code.
 To run it yourself, call `cargo +nightly -Zscript run.rs`.
 It will update the [results page](./results.md).
 
+- [Rust fmt size](#rust-fmt-size)
+  - [Analyzing u32 formatting](#analyzing-u32-formatting)
+    - [u32 by ufmt](#u32-by-ufmt)
+    - [u32 by fmt](#u32-by-fmt)
+  - [The effects of `dyn Write`](#the-effects-of-dyn-write)
+
+
 ## Analyzing u32 formatting
 
 Let's analyze how fmt and ufmt differ. They use similar algorithms.
 But the difference is that the fmt code is way more optimized for speed and sacrifices a lot of code size for it by
 including a lookup table and specializations for converting multiple digits at once.
+
+The results can be seen on the [results page](./results.md#fmt-comparison).
 
 I've removed the existing comments about the unsafe code. We can assume everything is safe.
 I've also changed the order of some of the functions and macros for clarity.
@@ -188,3 +197,33 @@ macro_rules! impl_Display {
     };
 }
 ```
+
+## The effects of `dyn Write`
+
+The rust formatting code uses a lot of `dyn Write`. This is probably to make the code not generic over the underlying
+output buffer types. If this weren't the case, both the `Debug` and `Display` traits would need to be generic over a `T: Write`.
+
+For example, this is also the case in the formatter.
+
+```rust
+pub struct Formatter<'a> {
+    flags: u32,
+    fill: char,
+    align: rt::Alignment,
+    width: Option<usize>,
+    precision: Option<usize>,
+
+    buf: &'a mut (dyn Write + 'a),
+}
+```
+
+This likely has some implications though. Because the code needs to go through this interface using essentially function pointers,
+it's opaque to the optimizer which makes us miss a lot of optimizations.
+
+Let's see how much that matters.
+
+*Note: The compiler is pretty good at devirtualization in simple situations, but it can't do it in real fmt code.
+So we need to use the black box so that the compiler can't optimize in the simple situation we have in the code.*
+
+The results can be seen on the [results page](./results.md#dyn-comparison).
+

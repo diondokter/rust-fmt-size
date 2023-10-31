@@ -1,6 +1,8 @@
 # Output
 
-## Fmt
+## Fmt-comparison
+
+### Fmt
 
 Test of builtin fmt machinery.
 
@@ -24,7 +26,7 @@ Test of builtin fmt machinery.
 |raw,fmt-f32|23632|2028|25660|
 |raw,fmt-no-args,fmt-u32,fmt-i32,fmt-f32|24788|2228|27016|
 
-## Ufmt
+### Ufmt
 
 Test of the ufmt crate.
 
@@ -49,4 +51,16 @@ Test of the ufmt crate.
 |ufmt-u32,ufmt-f32|2632|12|2644|
 |ufmt-i32,ufmt-f32|2644|12|2656|
 |raw,ufmt-no-args,ufmt-u32,ufmt-i32,ufmt-f32|2712|16|2728|
+
+## Dyn-comparison
+
+See that `raw` is similar to `ufmt-no-args` and `dyn` is similar to `fmt-no-args` of the fmt-comparison test.
+
+|features|text|rodata|total flash|
+|--------|---:|-----:|----------:|
+||500|0|500|
+|raw|716|4|720|
+|dyn|1268|28|1296|
+|raw,dyn|1308|28|1336|
+|raw,dyn|1308|28|1336|
 
