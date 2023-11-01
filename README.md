@@ -30,6 +30,7 @@ Since James' blog post from 2019, there's now the [`defmt` crate](https://defmt.
     - [u32 by fmt](#u32-by-fmt)
   - [The effects of `dyn Write`](#the-effects-of-dyn-write)
   - [Conclusion](#conclusion)
+  - [Bonus](#bonus)
 
 
 ## Analyzing u32 formatting
@@ -282,3 +283,18 @@ That leaves us with 3 options:
    This means benchmarking alternative implementations, removing panic paths, more code reuse, etc.
 
 *NOTE: I mention fast and slow formatting code, but `uFmt` [claims to be faster](https://docs.rs/ufmt/latest/ufmt/#benchmarks) on the tested embedded target.*
+
+## Bonus
+
+I decided to change the integer fmt implementation in the compiler to one similar to `uFmt`.
+It did maintain all of the padding and alignment options.
+
+Let's compare the [changes](https://github.com/rust-lang/rust/compare/master...diondokter:rust:smaller-fmt):
+
+|test|feature|size|
+|----|-------|---:|
+|nightly|fmt-u32|2256|
+|dev|fmt-u32|1900|
+|nightly|ufmt-u32|808|
+
+*Note: I think the code is correct, but I haven't tested it and I haven't benchmarked it (maybe it's faster idk 😉). Also, I can't figure out how to compile the llvm-tools so for this I'm using `arm-none-eabi-size` for the measurement, but it gives me some different numbers and I don't know why...*
