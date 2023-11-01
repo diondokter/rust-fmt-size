@@ -1,15 +1,28 @@
 # Rust fmt size
 
 Let's compare different binary sizes with regards to fmt code.
+This is made specifically for embedded use.
+
+The code generation has been set up to use the least amount of flash.
+- Compile with opt-level 'z'
+- Panic abort (and build the core lib with panic abort)
+- LTO is true (fat)
+- codegen units is 1
+- incremental is false
 
 To run it yourself, call `cargo +nightly -Zscript run.rs`.
-It will update the [results page](./results.md).
+It will update the [results page](./results.md) by compiling the projects with different combinations of feature flags.
+
+There are two embedded projects:
+- [fmt-comparison](./fmt-comparison) - Compare `core::fmt` with the much smaller `ufmt`
+- [dyn-comparison](./dyn-comparison) - Compare `&mut dyn Write` to `&mut impl Write`
 
 - [Rust fmt size](#rust-fmt-size)
   - [Analyzing u32 formatting](#analyzing-u32-formatting)
     - [u32 by ufmt](#u32-by-ufmt)
     - [u32 by fmt](#u32-by-fmt)
   - [The effects of `dyn Write`](#the-effects-of-dyn-write)
+  - [Conclusion](#conclusion)
 
 
 ## Analyzing u32 formatting
@@ -24,6 +37,10 @@ I've removed the existing comments about the unsafe code. We can assume everythi
 I've also changed the order of some of the functions and macros for clarity.
 
 ### u32 by ufmt
+
+<details>
+
+<summary>Rust ufmt code</summary>
 
 ```rust
 // Display refers to debug, so this is also the display implementation
@@ -95,7 +112,13 @@ macro_rules! uxx {
 }
 ```
 
+</details>
+
 ### u32 by fmt
+
+<details>
+
+<summary>Rust fmt code</summary>
 
 ```rust
 // Display is implemented through macros and there's some optimization here with the selection of the bits.
@@ -198,6 +221,8 @@ macro_rules! impl_Display {
 }
 ```
 
+</details>
+
 ## The effects of `dyn Write`
 
 The rust formatting code uses a lot of `dyn Write`. This is probably to make the code not generic over the underlying
@@ -213,12 +238,12 @@ pub struct Formatter<'a> {
     width: Option<usize>,
     precision: Option<usize>,
 
-    buf: &'a mut (dyn Write + 'a),
+    buf: &'a mut (dyn Write + 'a), // <== Here
 }
 ```
 
 This likely has some implications though. Because the code needs to go through this interface using essentially function pointers,
-it's opaque to the optimizer which makes us miss a lot of optimizations.
+it's opaque to the optimizer which makes us miss a lot of optimizations. And also the full `Write` trait implementation needs to be present.
 
 Let's see how much that matters.
 
@@ -227,3 +252,26 @@ So we need to use the black box so that the compiler can't optimize in the simpl
 
 The results can be seen on the [results page](./results.md#dyn-comparison).
 
+## Conclusion
+
+We've looked at the two main things that are costing flash memory space with regard to formatting.
+
+1. Using `dyn Write` as the interface to write to the buffers to.  
+   This causes us to miss optimizations (due to missing inlining) and requires the compiler to generate the full `Write` implementation for types even when parts of it aren't used.
+
+   `uFmt` solves this by creating its own `Formatter` that is generic over buffer `W: Write`.
+2. Formatting code created for speed, not for binary size.
+
+We cannot change 1 because just like `uFmt` we'd have to change the public `Formatter` signature which would be a pretty big breaking change.
+
+We can change 2, but lots of people will not be happy with slower formatting.
+That leaves us with 3 options:
+
+1. Have a pluggable formatting solution, similar to global alloc.  
+   People can then develop their own implementation.
+2. Have both a slow and a fast mode which you can choose to compile in.  
+   On embedded, we could then select the slow formatting code to save a bit on binary size.
+3. Go through the existing code and see what can be improved without making it slower.  
+   This means benchmarking alternative implementations, removing panic paths, more code reuse, etc.
+
+*NOTE: I mention fast and slow formatting code, but `uFmt` [claims to be faster](https://docs.rs/ufmt/latest/ufmt/#benchmarks) on the tested embedded target.*

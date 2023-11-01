@@ -16,7 +16,7 @@ ufmt_float = "0.2.0"
 lto = true
 debug = false
 opt-level = "z"
-# panic = "abort"
+panic = "abort"
 codegen-units = 1
 incremental = false
 

@@ -35,31 +35,45 @@ fn main() -> ! {
     }
 }
 
-#[inline(never)]
 fn write_generic_str(target: &mut impl core::fmt::Write, value: &'static str) {
     target.write_str(value).unwrap();
 }
 
-#[inline(never)]
 fn write_dyn_str(target: &mut dyn core::fmt::Write, value: &'static str) {
     target.write_str(value).unwrap();
 }
 
-#[inline(never)]
 fn write_generic_u32(target: &mut impl core::fmt::Write, mut value: u32) {
-    while value > 0 {
-        let digit = value % 10;
-        target.write_char(char::from_digit(digit, 10).unwrap()).unwrap();
-        value /= 10;
+    // Implementation uses more flash than ufmt, but doesn't use an intermediary buffer
+
+    if value == 0 {
+        target.write_char('0').unwrap();
+        return;
+    }
+
+    let mut digits = value.ilog10() + 1;
+
+    while digits > 0 {
+        let upper_value_digit = value / 10u32.pow(digits - 1);
+        target.write_char(char::from_digit(upper_value_digit, 10).unwrap()).unwrap();
+        value -= upper_value_digit * 10u32.pow(digits - 1);
+        digits -= 1;
     }
 }
 
-#[inline(never)]
 fn write_dyn_u32(target: &mut dyn core::fmt::Write, mut value: u32) {
-    while value > 0 {
-        let digit = value % 10;
-        target.write_char(char::from_digit(digit, 10).unwrap()).unwrap();
-        value /= 10;
+    if value == 0 {
+        target.write_char('0').unwrap();
+        return;
+    }
+
+    let mut digits = value.ilog10() + 1;
+
+    while digits > 0 {
+        let upper_value_digit = value / 10u32.pow(digits - 1);
+        target.write_char(char::from_digit(upper_value_digit, 10).unwrap()).unwrap();
+        value -= upper_value_digit * 10u32.pow(digits - 1);
+        digits -= 1;
     }
 }
 
