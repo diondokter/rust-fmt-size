@@ -17,7 +17,14 @@ There are two embedded projects:
 - [fmt-comparison](./fmt-comparison) - Compare `core::fmt` with the much smaller `ufmt`
 - [dyn-comparison](./dyn-comparison) - Compare `&mut dyn Write` to `&mut impl Write`
 
+More written about it here: https://jamesmunns.com/blog/fmt-unreasonably-expensive/
+
+Since James' blog post from 2019, there's now the [`defmt` crate](https://defmt.ferrous-systems.com/) that's quite prolific in the embedded space right now.
+
+## TOC
+
 - [Rust fmt size](#rust-fmt-size)
+  - [TOC](#toc)
   - [Analyzing u32 formatting](#analyzing-u32-formatting)
     - [u32 by ufmt](#u32-by-ufmt)
     - [u32 by fmt](#u32-by-fmt)
